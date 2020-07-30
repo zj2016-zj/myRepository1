@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zj.dao.SetmealDao">
+  <insert id="addSetmeal" parameterType="com.zj.pojo.Setmeal">
+      <selectKey resultType="Integer" keyColumn="id" order="AFTER" keyProperty="id">
+          SELECT LAST_INSERT_ID();
+      </selectKey>
+      insert into t_setmeal values(null,#{name},#{code},#{helpCode},#{sex},#{age},#{price},#{remark},#{attention},#{img})
+  </insert>
+    <insert id="addRelation" parameterType="map">
+        insert into t_setmeal_checkgroup values(#{setmeal_id},#{checkgroup_id})
+    </insert>
+    <select id="findPage" parameterType="String" resultType="com.zj.pojo.Setmeal">
+        select * from t_setmeal
+        <if test="queryString!=null">
+            where code = #{value} or name = #{value} or helpCode = #{value}
+        </if>
+    </select>
+    <delete id="deleteRelation" parameterType="Integer">
+        delete from t_setmeal_checkgroup where setmeal_id=#{value}
+    </delete>
+    <delete id="deleteSetmea" parameterType="Integer">
+        delete from t_setmeal where id=#{id}
+    </delete>
+    <select id="findById" parameterType="Integer" resultType="com.zj.pojo.Setmeal">
+        select * from t_setmeal where id=#{id}
+    </select>
+    <select id="findCheckgroupIdsBysetmealId" parameterType="Integer" resultType="Integer">
+        select * from t_setmeal_checkgroup where setmeal_id=#{value}
+    </select>
+    <update id="edit" parameterType="com.zj.pojo.Setmeal">
+        update t_setmeal set name=#{name},code=#{code},helpCode=#{helpCode},sex=#{sex},age=#{age},price=#{price},remark=#{remark},attention=#{attention},img=#{img} where id=#{id}
+    </update>
+    <select id="getAllSetmeal" resultType="com.zj.pojo.Setmeal">
+        select * from t_setmeal
+    </select>
+    <resultMap id="setmealAndGroup" type="com.zj.pojo.Setmeal">
+        <id property="id" column="id"></id>
+        <result column="name" property="name"></result>
+        <result column="code" property="code"></result>
+        <result column="helpCode" property="helpCode"></result>
+        <result column="sex" property="sex"></result>
+        <result column="age" property="age"></result>
+        <result column="price" property="price"></result>
+        <result column="remark" property="remark"></result>
+        <result column="attention" property="attention"></result>
+        <result column="img" property="img"></result>
+        <collection property="checkGroups" ofType="com.zj.pojo.CheckGroup" column="id"
+                    select="com.zj.dao.CheckGroupDao.findCheckGroupBySetmealId"></collection>
+    </resultMap>
+
+    <select id="findDetailsById" parameterType="Integer" resultMap="setmealAndGroup">
+        select * from t_setmeal where id=#{id}
+    </select>
+
+    <select id="findSetmealCount" resultType="map">
+        SELECT s.name,COUNT(o.id) AS value FROM t_order o,t_setmeal s WHERE o.setmeal_id=s.id GROUP BY s.name
+    </select>
+
+</mapper>

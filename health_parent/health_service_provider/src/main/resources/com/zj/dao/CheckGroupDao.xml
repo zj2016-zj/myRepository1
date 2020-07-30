@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zj.dao.CheckGroupDao">
+    <select id="findPage" parameterType="String" resultType="com.zj.pojo.CheckGroup">
+        select * from t_checkgroup
+        <where>
+            <if test="value!=null and value.length>0">
+                code=#{value} or name=#{value} or helpCode=#{value}
+            </if>
+        </where>
+    </select>
+    <select id="findById" parameterType="Integer" resultType="com.zj.pojo.CheckGroup">
+        select * from t_checkgroup where id=#{value}
+    </select>
+    <insert id="addGroup" parameterType="com.zj.pojo.CheckGroup">
+        <selectKey resultType="int" keyColumn="id" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID();
+        </selectKey>
+        insert into t_checkgroup values (null,#{code},#{name},#{helpCode},#{sex},#{remark},#{attention})
+    </insert>
+    <insert id="addRelation" parameterType="map">
+        insert into t_checkgroup_checkitem values(#{checkgroup_id},#{checkitem_id})
+    </insert>
+    <select id="findCheckItemIdsByCheckGroupId" parameterType="Integer" resultType="Integer">
+        select checkitem_id from t_checkgroup_checkitem where checkgroup_id=#{value}
+    </select>
+    <delete id="clearRelation" parameterType="Integer">
+        delete from t_checkgroup_checkitem where checkgroup_id=#{id}
+    </delete>
+    <update id="editGroup" parameterType="com.zj.pojo.CheckGroup">
+        update t_checkgroup set code=#{code},name=#{name},helpCode=#{helpCode},sex=#{sex},remark=#{remark},attention=#{attention} where id=#{id}
+    </update>
+    <delete id="deleteGroupById" parameterType="Integer">
+        delete from t_checkgroup where id=#{id}
+    </delete>
+    <select id="findAll" resultType="com.zj.pojo.CheckGroup">
+        select * from t_checkgroup
+    </select>
+    <resultMap id="setmealAndGroup" type="com.zj.pojo.CheckGroup">
+        <id column="id" property="id"></id>
+        <result column="code" property="code" ></result>
+        <result column="name" property="name" ></result>
+        <result column="helpCode" property="helpCode" ></result>
+        <result column="sex" property="sex" ></result>
+        <result column="remark" property="remark" ></result>
+        <result column="attention" property="attention" ></result>
+        <collection property="checkItems" column="id" ofType="com.zj.pojo.CheckItem"
+                    select="com.zj.dao.CheckItemDao.findCheckItemByCheckGroupId"></collection>
+    </resultMap>
+    <select id="findCheckGroupBySetmealId" parameterType="Integer" resultMap="setmealAndGroup">
+        SELECT * FROM t_checkgroup where id in
+        (select checkgroup_id from t_setmeal_checkgroup where setmeal_id=#{id})
+    </select>
+</mapper>

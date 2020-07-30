@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zj.dao.MemberDao">
+    <select id="findMemberByTelephone" parameterType="String" resultType="com.zj.pojo.Member">
+        select * from t_member where phoneNumber=#{phoneNumber}
+    </select>
+
+    <insert id="addMember" parameterType="com.zj.pojo.Member">
+        <selectKey resultType="java.lang.Integer" order="AFTER"
+                   keyProperty="id" >
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into t_member values(null,#{fileNumber},#{name},#{sex},#{idCard},#{phoneNumber},
+        #{regTime},#{password},#{email},#{birthday},#{remark})
+    </insert>
+    <select id="findMemberCountByMonth" resultType="int" parameterType="String">
+        select count(id) from t_member where regTime &lt;=#{month}
+    </select>
+    <select id="gettodayNewMember" parameterType="String" resultType="Integer">
+        select count(id) from t_member where regTime=#{today}
+    </select>
+    <select id="getTotalMember" resultType="Integer">
+        SELECT COUNT(*) FROM t_member;
+    </select>
+    <select id="getThisWeekOrMonthNewMember" parameterType="String" resultType="integer">
+        select count(id) from t_member where regTime>=#{thisWeekMonday}
+    </select>
+</mapper>

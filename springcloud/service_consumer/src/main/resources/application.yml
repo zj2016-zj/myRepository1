@@ -1,0 +1,15 @@
+server:
+  port: 8088
+spring:
+  application:
+    name: serviceConsumer
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:10087/eureka
+serviceProvider:
+   ribbon:
+     NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
+feign:
+  hystrix:
+    enabled: true

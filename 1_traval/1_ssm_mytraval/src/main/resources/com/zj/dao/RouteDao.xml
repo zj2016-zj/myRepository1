@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zj.dao.RouteDao">
+    <select id="findPage" parameterType="String" resultType="Route">
+        select * from tab_route
+        <where>
+            <if test="value != null and value.length > 0">
+                rname='%${value}%'
+            </if>
+        </where>
+    </select>
+</mapper>

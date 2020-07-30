@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zj.dao.OrderDao">
+    <insert id="addOrder" parameterType="com.zj.pojo.Order">
+        <!--添加预约信息到预约表-->
+        <selectKey resultType="java.lang.Integer" order="AFTER"
+                   keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into  t_order(member_id,orderDate,orderType,orderStatus,setmeal_id)
+        values(#{memberId},#{orderDate},#{orderType},#{orderStatus},#{setmealId})
+    </insert>
+    <resultMap id="baseResultMap" type="com.zj.pojo.Order">
+        <id column="id" property="id"/>
+        <result column="member_id" property="memberId"/>
+        <result column="orderDate" property="orderDate"/>
+        <result column="orderType" property="orderType"/>
+        <result column="orderStatus" property="orderStatus"/>
+        <result column="setmeal_id" property="setmealId"/>
+    </resultMap>
+    <select id="findByCondition" parameterType="com.zj.pojo.Order" resultType="com.zj.pojo.Order">
+        select * from t_order
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="memberId != null">
+                and member_id = #{memberId}
+            </if>
+            <if test="orderDate != null">
+                and orderDate = #{orderDate}
+            </if>
+            <if test="orderType != null">
+                and orderType = #{orderType}
+            </if>
+            <if test="orderStatus != null">
+                and orderStatus = #{orderStatus}
+            </if>
+            <if test="setmealId != null">
+                and setmeal_id = #{setmealId}
+            </if>
+        </where>
+    </select>
+    <select id="findByOrderId" parameterType="Integer" resultType="map">
+         select m.name member ,s.name setmeal,o.orderDate orderDate,o.orderType orderType from
+              t_order o,
+              t_member m,
+              t_setmeal s
+          where o.member_id=m.id and o.setmeal_id=s.id and o.id=#{id}
+    </select>
+    <select id="getTodayOrderNumber" parameterType="string" resultType="integer">
+        select count(id)  from t_order where orderDate=#{today}
+    </select>
+    <select id="getTodayVisitsNumber" parameterType="string" resultType="integer">
+        select count(id) from t_order where orderDate=#{today} and orderStatus='已到诊'
+    </select>
+    <select id="getThisWeekOrMonthOrderNumber" resultType="integer" parameterType="string">
+        SELECT COUNT(id) from t_order where orderDate>=#{weekFirst}
+    </select>
+    <select id="thisWeekOrMonthVisitsNumber" parameterType="STRING" resultType="Integer">
+        select count(id) from t_order where orderDate>=#{weekFirst} and orderStatus='已到诊'
+    </select>
+    <select id="getHotSetmeal" resultType="map">
+         SELECT s.name,
+      COUNT(o.id) setmeal_count,
+      COUNT(o.id)/(SELECT COUNT(id) FROM t_order) proportion
+      FROM t_order o,t_setmeal s WHERE s.id=o.setmeal_id
+      GROUP BY o.setmeal_id
+      ORDER BY setmeal_count DESC
+      LIMIT 0,4;
+    </select>
+</mapper>

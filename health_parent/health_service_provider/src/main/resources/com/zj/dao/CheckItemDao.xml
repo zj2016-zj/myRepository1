@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zj.dao.CheckItemDao">
+<!--    插入检查项的信息-->
+    <insert id="addCheckItem" parameterType="com.zj.pojo.CheckItem">  /*id的接口里面的方法名称  parameterType 描述的是新增方法里面的参数类型*/
+        INSERT INTO t_checkitem(CODE,NAME,sex,age,price,TYPE,attention,remark)
+                VALUES(#{code},#{name},#{sex},#{age},#{price},#{type},#{attention},#{remark})
+    </insert>
+<!--根据条件查询检查项全部信息-->
+    <select id="findPage" parameterType="String" resultType="com.zj.pojo.CheckItem">
+        select *  from t_checkitem
+        <if test="value != null and value.length > 0">
+            where code = #{value} or name = #{value}
+        </if>
+    </select>
+<!--    根据id进行检查项的信息-->
+    <select id="findById" parameterType="Integer" resultType="com.zj.pojo.CheckItem">
+        select * from t_checkitem where id=#{cid}
+    </select>
+<!--编辑检查项信息-->
+    <update id="edit" parameterType="com.zj.pojo.CheckItem">
+        update t_checkitem set code=#{code},name=#{name},sex=#{sex},age=#{age},price=#{price},type=#{type},attention=#{attention},remark=#{remark} where id=#{id}
+    </update>
+<!--   根据检查项id进行检查项组的统计-->
+    <select id="findCountById" resultType="int" parameterType="int">
+         select count(*) from t_checkgroup_checkitem where checkitem_id = #{checkitem_id}
+    </select>
+<!--    根据检查项id删除检查项-->
+    <delete id="deleteById" parameterType="int">
+        delete from t_checkitem where id=#{id}
+    </delete>
+    <select id="findAll" resultType="com.zj.pojo.CheckItem">
+        select * from t_checkitem
+    </select>
+    <select id="findCheckItemByCheckGroupId" parameterType="Integer" resultType="com.zj.pojo.CheckItem">
+        select * from t_checkitem where id in
+        (select checkitem_id from t_checkgroup_checkitem where checkgroup_id=#{id} )
+    </select>
+</mapper>
